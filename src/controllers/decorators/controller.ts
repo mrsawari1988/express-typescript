@@ -3,25 +3,7 @@ import { AppRouter } from '../../AppRouter';
 import { MetadataKeys } from './MetadataKeys';
 import { Methods } from './Methods';
 import { RequestHandler, Response, Request, NextFunction } from 'express';
-import { ValidationChain, validationResult } from 'express-validator';
-
-function bodyValidators(keys: string): RequestHandler {
-    return function (req: Request, res: Response, next: NextFunction) {
-        if (!req.body) {
-            res.status(422).send('Invalid Request');
-            return;
-        }
-
-        for (let key of keys) {
-            if (!req.body[key]) {
-                res.status(422).send(`the property ${key} is missing`);
-                return;
-            }
-        }
-
-        next();
-    };
-}
+import { validationResult } from 'express-validator';
 
 function expressValidators(): RequestHandler {
     return function (req: Request, res: Response, next: NextFunction) {
@@ -31,7 +13,7 @@ function expressValidators(): RequestHandler {
         }
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            res.status(422).send('the request was badly');
+            res.status(422).send('email and password are required !');
             return;
         }
         next();
@@ -53,7 +35,6 @@ export function controller(routePrefix: string) {
             const requiredBodyProps =
                 Reflect.getMetadata(MetadataKeys.validator, target.prototype, key) || [];
 
-            // const validator = bodyValidators(requiredBodyProps);
             const validator = expressValidators();
 
             if (path) {

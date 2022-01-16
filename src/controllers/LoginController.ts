@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { get, controller, use, post, bodyValidator, expressValidator } from './decorators';
-import { loginInputValidator } from './loginValidators/loginInputValidator';
+import { loginInputValidator } from './validators/loginInputValidator';
 
 @controller('/auth')
 export class LoginController {
