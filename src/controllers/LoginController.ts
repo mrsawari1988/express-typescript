@@ -1,14 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
-import { get, controller, use, post, bodyValidator } from './decorators';
+import { get, controller, use, post, bodyValidator, expressValidator } from './decorators';
+import { loginInputValidator } from './loginValidators/loginInputValidator';
 
-function sample(req: Request, res: Response, next: NextFunction) {
-    console.log('middleware is working');
-    next();
-}
 @controller('/auth')
 export class LoginController {
     @get('/login')
-    @use(sample)
     getLogin(req: Request, res: Response) {
         res.send(`
           <form method="POST">
@@ -25,7 +21,8 @@ export class LoginController {
         `);
     }
     @post('/login')
-    @bodyValidator('email', 'password')
+    // @bodyValidator('email', 'password')
+    @expressValidator(loginInputValidator)
     postLogin(req: Request, res: Response) {
         const { email, password } = req.body;
 

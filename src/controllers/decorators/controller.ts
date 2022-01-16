@@ -3,6 +3,7 @@ import { AppRouter } from '../../AppRouter';
 import { MetadataKeys } from './MetadataKeys';
 import { Methods } from './Methods';
 import { RequestHandler, Response, Request, NextFunction } from 'express';
+import { ValidationChain, validationResult } from 'express-validator';
 
 function bodyValidators(keys: string): RequestHandler {
     return function (req: Request, res: Response, next: NextFunction) {
@@ -22,6 +23,21 @@ function bodyValidators(keys: string): RequestHandler {
     };
 }
 
+function expressValidators(): RequestHandler {
+    return function (req: Request, res: Response, next: NextFunction) {
+        if (!req.body) {
+            res.status(422).send('Invalid Request');
+            return;
+        }
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            res.status(422).send('the request was badly');
+            return;
+        }
+        next();
+    };
+}
+
 export function controller(routePrefix: string) {
     return function (target: Function) {
         const router = AppRouter.getInstance();
@@ -37,10 +53,17 @@ export function controller(routePrefix: string) {
             const requiredBodyProps =
                 Reflect.getMetadata(MetadataKeys.validator, target.prototype, key) || [];
 
-            const validator = bodyValidators(requiredBodyProps);
+            // const validator = bodyValidators(requiredBodyProps);
+            const validator = expressValidators();
 
             if (path) {
-                router[method](`${routePrefix}${path}`, ...middlewares, validator, routeHandler);
+                router[method](
+                    `${routePrefix}${path}`,
+                    ...middlewares,
+                    requiredBodyProps,
+                    validator,
+                    routeHandler
+                );
             }
         }
     };
