@@ -1,5 +1,5 @@
 # express-typescript
-a project to integrate **typescript** with **express** using typescript features like **metadada** and **decorators**
+a project to integrate **typescript** with **express** using typescript features like **metadata** and **decorators**
 
 ## install project dependencies :
 ``
